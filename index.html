@@ -99,7 +99,55 @@
       border-radius: 32px;
       border: 1px solid rgba(120, 167, 255, 0.08);
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
     }
+
+    .app.ready {
+      animation: appIntro 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes appIntro {
+      0% { opacity: 0; transform: translateY(14px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .app { opacity: 1; transform: none; }
+      .app.ready { animation: none; }
+    }
+
+    #bootScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: radial-gradient(ellipse at 50% 0%, #17281d 0%, #070f0b 70%);
+      transition: opacity 0.45s ease;
+    }
+
+    #bootScreen .boot-leaf {
+      font-size: 46px;
+      animation: bootPulse 1.1s ease-in-out infinite;
+    }
+
+    #bootScreen .boot-text {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    @keyframes bootPulse {
+      0%, 100% { transform: scale(0.92); opacity: 0.75; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+
+    #bootScreen.hide { opacity: 0; pointer-events: none; }
 
     header {
       display: flex;
@@ -149,6 +197,9 @@
       transition: var(--transition-smooth);
       letter-spacing: 0.3px;
       flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -252,6 +303,7 @@
       box-shadow: var(--shadow-heavy);
       position: relative;
       touch-action: manipulation;
+      overflow: hidden; /* fırlayan oklar kart sınırlarının dışına taşıp "board'un altından bir şey çıkıyor" hissi vermesin */
     }
 
     .cell {
@@ -537,22 +589,24 @@
       font-weight: 600;
     }
 
-    .merge { animation: chillMerge 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .merge { animation: chillMerge 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes chillMerge {
       0% { transform: scale(0.70) rotate(-4deg); opacity: 0.4; filter: brightness(1.6); }
-      40% { transform: scale(1.10) rotate(2deg); opacity: 1; filter: brightness(1.2) drop-shadow(0 0 24px rgba(98, 214, 176, 0.5)); }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; filter: brightness(1) drop-shadow(0 0 0px transparent); }
+      35% { transform: scale(1.16) rotate(3deg); opacity: 1; filter: brightness(1.35) drop-shadow(0 0 28px rgba(98, 214, 176, 0.6)); box-shadow: 0 0 0 6px rgba(98, 214, 176, 0.10); }
+      65% { transform: scale(0.96) rotate(-1deg); filter: brightness(1.15) drop-shadow(0 0 16px rgba(98, 214, 176, 0.35)); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; filter: brightness(1) drop-shadow(0 0 0px transparent); box-shadow: none; }
     }
 
     .fly {
-      animation: fly 0.50s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      animation: fly 0.50s cubic-bezier(0.3, 0, 0.4, 1) forwards;
       z-index: 10;
     }
 
     @keyframes fly {
       0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; filter: brightness(1.2) drop-shadow(0 0 20px rgba(120, 167, 255, 0.3)); }
-      60% { opacity: 0.9; filter: brightness(1.6) drop-shadow(0 0 40px rgba(120, 167, 255, 0.6)); }
-      100% { transform: translate(var(--dx), var(--dy)) scale(0.15) rotate(360deg); opacity: 0; filter: brightness(2) drop-shadow(0 0 60px rgba(120, 167, 255, 0.8)); }
+      15% { transform: translate(calc(var(--dx) * 0.02), calc(var(--dy) * 0.02)) scale(1.12) rotate(-8deg); filter: brightness(1.4) drop-shadow(0 0 26px rgba(120, 167, 255, 0.5)); }
+      55% { opacity: 0.95; filter: brightness(1.7) drop-shadow(0 0 44px rgba(120, 167, 255, 0.65)); }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0.1) rotate(340deg); opacity: 0; filter: brightness(2.1) drop-shadow(0 0 60px rgba(120, 167, 255, 0.8)); }
     }
 
     .toast {
@@ -739,9 +793,27 @@
     @supports not (backdrop-filter: blur(1px)) {
       .app, .board, .side, .card, .toast, .btn-reset { background-color: rgba(18, 26, 40, 0.92); }
     }
+
+    .power-info { font-size: 9px; line-height: 1.25; color: var(--text-muted); margin-top: 3px; padding: 0 3px; }
+    .toolbar { display:flex; gap:8px; margin-top:12px; }
+    .tool-btn { flex:1; border:1px solid rgba(120,167,255,.14); background:rgba(120,167,255,.07); color:var(--text-primary); border-radius:12px; padding:9px 6px; font-size:11px; cursor:pointer; }
+    .challenge { margin-top:12px; padding:10px; border-radius:14px; background:rgba(98,214,176,.06); border:1px solid rgba(98,214,176,.12); }
+    .challenge-title { font-size:10px; color:var(--accent-cyan); font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+    .challenge-text { font-size:11px; margin-top:4px; line-height:1.4; }
+    .challenge-progress { font-size:10px; color:var(--text-muted); margin-top:4px; }
+    .achievement { display:flex; align-items:center; gap:10px; padding:9px; border-radius:12px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.04); }
+    .achievement.locked { opacity:.42; }
+    .achievement .ai { font-size:20px; width:28px; text-align:center; }
+    .achievement .at { font-size:11px; font-weight:700; }
+    .achievement .ad { font-size:10px; color:var(--text-muted); margin-top:2px; }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .stat-box { background:rgba(255,255,255,.035); border-radius:12px; padding:10px; }
+    .stat-box .n { font-size:18px; font-weight:800; color:var(--accent-gold); }
+    .stat-box .l { font-size:9px; color:var(--text-muted); margin-top:2px; }
   </style>
 </head>
 <body>
+  <div id="bootScreen"><div class="boot-leaf">🌿</div><div class="boot-text">Ekosistem hazırlanıyor</div></div>
   <div class="fireflies" id="fireflies" aria-hidden="true"></div>
 
   <div class="app">
@@ -753,13 +825,14 @@
       <div class="hud">
         <div class="card"><div class="label">En Yüksek</div><div class="value" id="best">Lv. 1</div></div>
         <div class="card"><div class="label">Rekor</div><div class="value" id="highscore">0</div></div>
-        <div class="card"><div class="label">Süre</div><div class="value" id="time">00:00</div></div>
+        <div class="card"><div class="label" id="timeLabel">Süre</div><div class="value" id="time">00:00</div></div>
         <div class="card"><div class="label">Puan</div><div class="value" id="score">0</div></div>
       </div>
       <div class="header-actions">
-        <button class="btn-icon" id="muteBtn" aria-label="Sesi kapat/aç" title="Sesi kapat/aç">🔊</button>
-        <button class="btn-icon" id="helpBtn" aria-label="Nasıl oynanır" title="Nasıl oynanır">❓</button>
-        <button class="btn-reset" id="reset" aria-label="Yeni oyun">⟳</button>
+        <button class="btn-icon" id="modeBtn" aria-label="Mod seç" title="Mod seç"></button>
+        <button class="btn-icon" id="muteBtn" aria-label="Sesi kapat/aç" title="Sesi kapat/aç"></button>
+        <button class="btn-icon" id="helpBtn" aria-label="Nasıl oynanır" title="Nasıl oynanır"></button>
+        <button class="btn-reset" id="reset" aria-label="Yeni oyun"></button>
       </div>
     </header>
 
@@ -772,10 +845,12 @@
           <button id="cancelPowerBtn">İptal ✕</button>
         </div>
         <div id="collection" class="collection" role="list"></div>
-        <div class="tip">
-          <b>💡 Güçler:</b> Lv.3 ve üstü her zaman kullanılabilir (tur bağımsız).<br>
-          <b>Lv.9 (Infinity)</b> gücü, tüm Lv.5+ elementleri siler!
+        <div id="dailyChallenge" class="challenge"></div>
+        <div class="toolbar">
+          <button class="tool-btn" id="statsBtn">İstatistikler</button>
+          <button class="tool-btn" id="achievementsBtn">Başarımlar</button>
         </div>
+        <div class="tip"><b>Güçler:</b> Element kartında ne yaptığını görebilirsin.</div>
       </aside>
     </div>
   </div>
@@ -790,19 +865,46 @@
       <ul>
         <li><span class="ico">👆</span><div>Bir <b>ok</b>a tıkla — baktığı yönde tahtanın dışına çıkabiliyorsa fırlar ve koleksiyona eklenir.</div></li>
         <li><span class="ico">🔗</span><div>Aynı seviyeden <b>2 element</b> koleksiyonda birleşip bir üst seviyeye yükselir (🌰→🌸→🌳→…).</div></li>
-        <li><span class="ico">✨</span><div><b>Lv.3 ve üstü</b> elementlere tıklayıp "güç" olarak seçebilir, sonra bir <b>duvarı kırabilir</b> ya da bir <b>oku çevirebilirsin</b>.</div></li>
+        <li><span class="ico">✨</span><div><b>Güçler:</b> Lv.3 oku döndürür; Lv.4 duvar kırar; Lv.5 satır; Lv.6 sütun temizler; Lv.7 üç okun yönünü düzeltir; Lv.8 iki duvar kaldırır; Lv.9 tüm duvarları kaldırır; Lv.10 tahtayı tamamen temizler.</div></li>
         <li><span class="ico">♾️</span><div><b>Lv.9 (Infinity)</b> gücü tüm Lv.5+ elementleri siler — dikkatli kullan!</div></li>
         <li><span class="ico">🧱</span><div>Her turda tahtaya bir <b>duvar</b> daha eklenir, zorluk kademeli artar.</div></li>
         <li><span class="ico">📦</span><div>Koleksiyon kapasitesi <b>8</b> ile sınırlı — dolarsa güç kullanmadan yeni ok toplayamazsın.</div></li>
+        <li><span class="ico">🗺️</span><div><b>Board Modu:</b> üstteki 🗺️ butonuyla Klasik, Zen (duvarsız/rahat) veya Zaman Yarışı (tur başına süre sınırı) arasında geçiş yapabilirsin.</div></li>
       </ul>
       <button class="modal-btn" id="startPlayingBtn">Anladım, oynayalım</button>
     </div>
   </div>
 
+  <div class="modal-overlay" id="statsModal">
+    <div class="modal">
+      <button class="btn-icon modal-close" id="closeStatsBtn" aria-label="Kapat">✕</button>
+      <h2>İstatistikler</h2><div class="modal-sub">Nature Flow ilerlemen</div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <button class="modal-btn" id="closeStatsBtn2" style="margin-top:14px">Kapat</button>
+    </div>
+  </div>
+  <div class="modal-overlay" id="achievementsModal">
+    <div class="modal">
+      <button class="btn-icon modal-close" id="closeAchievementsBtn" aria-label="Kapat">✕</button>
+      <h2>Başarımlar</h2><div class="modal-sub">Oynadıkça yeni hedefler açılır.</div>
+      <ul id="achievementList" style="gap:8px"></ul>
+      <button class="modal-btn" id="closeAchievementsBtn2">Kapat</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modeModal">
+    <div class="modal">
+      <button class="btn-icon modal-close" id="closeModeBtn" aria-label="Kapat">✕</button>
+      <h2>🗺️ Board Modu</h2>
+      <div class="modal-sub">Mod değiştirmek mevcut oyunu sıfırlar (koleksiyonun korunur).</div>
+      <ul id="modeList" style="gap:8px; list-style:none;"></ul>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="gameOverModal">
     <div class="modal">
-      <h2>🍂 Hamle Kalmadı</h2>
-      <div class="modal-sub">Tahtada oynanabilir bir ok kalmadı ve elindeki güçler bunu açamıyor.</div>
+      <h2 id="goTitle">🍂 Hamle Kalmadı</h2>
+      <div class="modal-sub" id="goSub">Tahtada oynanabilir bir ok kalmadı ve elindeki güçler bunu açamıyor.</div>
       <div class="stat-row">
         <div class="stat"><div class="n" id="goScore">0</div><div class="l">Puan</div></div>
         <div class="stat"><div class="n" id="goRound">1</div><div class="l">Tur</div></div>
@@ -815,7 +917,7 @@
   <script>
     const N = 6;
     const MAX_CAP = 8;
-    const SAVE_KEY = 'natureFlow_collection_v3';
+    const SAVE_KEY = 'natureFlow_collection_v4';
     const dirs = {
       up: [-1, 0, '↑', 'right'],
       right: [0, 1, '→', 'down'],
@@ -825,6 +927,20 @@
 
     const names = ['Seed', 'Flower', 'Tree', 'Forest', 'Ecosystem', 'Planet', 'Star', 'Galaxy', 'Universe', 'Infinity'];
     const icons = ['🌰', '🌸', '🌳', '🌲', '🦋', '🌍', '☀️', '🌌', '♾️', '✨'];
+    const powerDescriptions = {3:'Bir oku açık çıkış yönüne çevir.',4:'Seçtiğin duvarı kaldır.',5:'Seçtiğin satırdaki tüm okları temizle.',6:'Seçtiğin sütundaki tüm okları temizle.',7:'En fazla 3 okun yönünü düzelt.',8:'2 duvarı kaldır ve seçilen oku aç.',9:'Tüm duvarları kaldır ve kapalı okların yönlerini düzelt.',10:'Tahtadaki tüm okları ve duvarları temizle.'};
+
+    // ---- Board modları ----
+    // wallCap/wallStep: tur başına duvar artışı ve tavanı. probStart/probStep/probFloor: "kolay yönlü" ok üretme olasılığının tur bazlı düşüşü.
+    const MODES = {
+      classic: { label: '🌿 Klasik', desc: 'Dengeli zorluk artışı.', wallStep: 1, wallCap: 6, probStart: 0.42, probStep: 0.04, probFloor: 0.12, timeRush: false },
+      zen: { label: '🍃 Zen', desc: 'Duvar yok, sabit kolaylık — pratik ve rahatlama modu.', wallStep: 0, wallCap: 0, probStart: 0.55, probStep: 0, probFloor: 0.55, timeRush: false },
+      rush: { label: '⏱️ Zaman Yarışı', desc: 'Her tur için süre sınırı var, hızlı temizleyene bonus puan.', wallStep: 1, wallCap: 6, probStart: 0.42, probStep: 0.04, probFloor: 0.12, timeRush: true, roundSeconds: 40 }
+    };
+    const MODE_SAVE_KEY = 'natureFlow_mode_v1';
+    let mode = 'classic';
+
+    let stats = {arrows:0, merges:0, bestRound:1, bestCombo:0, bestLevel:1, bestScore:0, powers:0};
+    let daily = null;
 
     let arrows = [];
     let walls = [];
@@ -842,6 +958,12 @@
     let muted = false;
     let toastQueue = [];
     let toastBusy = false;
+    let combo = 0;
+    let comboTimer = null;
+    let lastActionAt = 0;
+    let rushTimeLeft = 0;
+    let rushInterval = null;
+    let gameOverReason = 'deadlock';
 
     function rand(a) { return a[Math.floor(Math.random() * a.length)]; }
 
@@ -885,13 +1007,34 @@
       error: () => playTone(160, 0.15, 'sawtooth', 0.05),
       power: () => { playTone(340, 0.1, 'square', 0.05); playTone(500, 0.14, 'square', 0.05, 0.07); },
       round: () => { playTone(440, 0.12, 'sine', 0.07); playTone(660, 0.14, 'sine', 0.07, 0.1); playTone(880, 0.2, 'sine', 0.06, 0.2); },
-      gameover: () => { playTone(300, 0.2, 'sine', 0.07); playTone(220, 0.3, 'sine', 0.06, 0.18); }
+      gameover: () => { playTone(300, 0.2, 'sine', 0.07); playTone(220, 0.3, 'sine', 0.06, 0.18); },
+      combo: () => { playTone(720, 0.09, 'triangle', 0.06); playTone(960, 0.1, 'triangle', 0.06, 0.05); playTone(1200, 0.12, 'triangle', 0.05, 0.1); },
+      challenge: () => { playTone(520, 0.12, 'sine', 0.08); playTone(780, 0.14, 'sine', 0.07, 0.08); playTone(1040, 0.18, 'sine', 0.06, 0.16); },
+      achievement: () => { playTone(600, 0.1, 'triangle', 0.07); playTone(900, 0.12, 'triangle', 0.07, 0.09); playTone(1200, 0.16, 'triangle', 0.06, 0.18); playTone(1500, 0.22, 'sine', 0.05, 0.28); }
     };
+
+    // ---- SVG ikonlar (emoji yerine — Polish: madde 13/14) ----
+    const ICONS = {
+      mode: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+      soundOn: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 8.5a5 5 0 0 1 0 7"/><path d="M19.5 6a8.5 8.5 0 0 1 0 12"/></svg>',
+      soundOff: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 5M22 9l-5 5"/></svg>',
+      help: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9a2.8 2.8 0 1 1 3.9 2.6c-.9.5-1.4 1-1.4 2"/><path d="M12 17h.01"/></svg>',
+      reset: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 2.6 6.3"/><path d="M3 20v-6h6"/></svg>'
+    };
+
+    function applyStaticIcons() {
+      const modeBtn = document.getElementById('modeBtn');
+      const helpBtn = document.getElementById('helpBtn');
+      const resetBtn = document.getElementById('reset');
+      if (modeBtn) modeBtn.innerHTML = ICONS.mode;
+      if (helpBtn) helpBtn.innerHTML = ICONS.help;
+      if (resetBtn) resetBtn.innerHTML = ICONS.reset;
+    }
 
     function toggleMute() {
       muted = !muted;
       const btn = document.getElementById('muteBtn');
-      btn.textContent = muted ? '🔇' : '🔊';
+      btn.innerHTML = muted ? ICONS.soundOff : ICONS.soundOn;
       btn.setAttribute('aria-label', muted ? 'Sesi aç' : 'Sesi kapat');
       try { localStorage.setItem('natureFlow_muted', muted ? '1' : '0'); } catch (e) {}
     }
@@ -929,8 +1072,10 @@
       }
     }
 
-    // ---- Oynama süresi sayacı ----
+    // ---- Oynama süresi sayacı (Klasik / Zen: toplam geçen süre) ----
     function startTimer() {
+      const timeLabel = document.getElementById('timeLabel');
+      if (timeLabel) timeLabel.textContent = 'Süre';
       startTime = Date.now();
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(updateTimer, 1000);
@@ -942,7 +1087,41 @@
       const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
       const ss = String(elapsed % 60).padStart(2, '0');
       const el = document.getElementById('time');
-      if (el) el.textContent = mm + ':' + ss;
+      if (el) { el.textContent = mm + ':' + ss; el.style.color = ''; }
+    }
+
+    // ---- Tur bazlı geri sayım (Zaman Yarışı modu) ----
+    function stopRushTimer() {
+      if (rushInterval) { clearInterval(rushInterval); rushInterval = null; }
+    }
+
+    function startRushTimer() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      stopRushTimer();
+      const cfg = MODES[mode] || MODES.classic;
+      rushTimeLeft = cfg.roundSeconds;
+      const timeLabel = document.getElementById('timeLabel');
+      if (timeLabel) timeLabel.textContent = 'Kalan Süre';
+      updateRushDisplay();
+      rushInterval = setInterval(() => {
+        rushTimeLeft--;
+        updateRushDisplay();
+        if (rushTimeLeft <= 0) {
+          stopRushTimer();
+          gameOverReason = 'time';
+          showGameOver();
+        }
+      }, 1000);
+    }
+
+    function updateRushDisplay() {
+      const el = document.getElementById('time');
+      if (!el) return;
+      const t = Math.max(0, rushTimeLeft);
+      const mm = String(Math.floor(t / 60)).padStart(2, '0');
+      const ss = String(t % 60).padStart(2, '0');
+      el.textContent = mm + ':' + ss;
+      el.style.color = t <= 10 ? 'var(--accent-rose)' : '';
     }
 
     function show(msg) {
@@ -1020,21 +1199,37 @@
       }
     }
 
-    function addEvent(level) {
+    function registerCombo() {
+      const now = Date.now();
+      if (now - lastActionAt <= 2200) combo = Math.min(combo + 1, 5);
+      else combo = 1;
+      lastActionAt = now;
+      stats.bestCombo = Math.max(stats.bestCombo, combo);
+      clearTimeout(comboTimer);
+      comboTimer = setTimeout(() => { combo = 0; }, 2300);
+      return Math.max(1, combo);
+    }
+
+    function addEvent(level, comboMultiplier = 1) {
       collection[level] = (collection[level] || 0) + 1;
+      stats.arrows++;
+      stats.bestLevel = Math.max(stats.bestLevel, level);
       sfx.fly();
       vibrate(10);
 
+      let mergeChain = 0;
       while (collection[level] >= 2) {
         collection[level] -= 2;
         if (collection[level] === 0) delete collection[level];
 
         const next = level + 1;
         collection[next] = (collection[next] || 0) + 1;
-
+        mergeChain++;
         merges++;
         best = Math.max(best, next);
-        score += next * 50;
+
+        // Merge zinciri ve aktif combo birlikte ödüllendirilir.
+        score += next * 50 * comboMultiplier * mergeChain;
         sfx.merge();
         vibrate([12, 30, 12]);
 
@@ -1043,36 +1238,96 @@
           const rect = panel.getBoundingClientRect();
           spawnParticles(rect.left + rect.width / 2, rect.top + 16, 'var(--accent-cyan)');
         }
-
+        if (mergeChain > 1) show(`Zincir merge ×${mergeChain}!`);
         level = next;
       }
 
+      if (mergeChain > 0 && comboMultiplier > 1) {
+        score += mergeChain * 25 * comboMultiplier;
+      }
       saveCollection();
       updateHud();
       renderCollection();
     }
 
     function usePower(costLevel) {
-      if (costLevel === 9) {
-        Object.keys(collection).map(Number).forEach(l => {
-          if (l >= 5) delete collection[l];
-        });
-        show('🌌 Level 9 gücü! Tüm Lv.5+ elementler yok edildi!');
-      } else {
-        collection[costLevel]--;
-        if (collection[costLevel] <= 0) delete collection[costLevel];
-      }
-
+      if (!collection[costLevel]) return;
+      stats.powers++;
+      collection[costLevel]--;
+      if (collection[costLevel] <= 0) delete collection[costLevel];
       saveCollection();
       activePower = null;
       updateHud();
       renderCollection();
     }
 
+    function applyPower(level, type, item) {
+      if (!item && level < 9) return false;
+
+      if (level === 3 && type === 'arrow') {
+        const openDir = findExitDirection(item.r, item.c);
+        if (!openDir) return false;
+        item.d = openDir;
+        show('Lv.3: Ok açık çıkışa döndürüldü.');
+      } else if (level === 4 && type === 'wall') {
+        walls = walls.filter(w => w.id !== item.id);
+        show('Lv.4: Duvar kırıldı.');
+      } else if (level === 5 && type === 'arrow') {
+        const removed = arrows.filter(a => a.r === item.r).length;
+        arrows = arrows.filter(a => a.r !== item.r);
+        score += removed * 15;
+        show(`Lv.5: Satır temizlendi (${removed} ok).`);
+      } else if (level === 6 && type === 'arrow') {
+        const removed = arrows.filter(a => a.c === item.c).length;
+        arrows = arrows.filter(a => a.c !== item.c);
+        score += removed * 20;
+        show(`Lv.6: Sütun temizlendi (${removed} ok).`);
+      } else if (level === 7 && type === 'arrow') {
+        let changed = 0;
+        arrows.forEach(a => {
+          if (changed >= 3) return;
+          const d = findExitDirection(a.r, a.c);
+          if (d && d !== a.d) { a.d = d; changed++; }
+        });
+        show(`Lv.7: ${changed} ok için yol açıldı.`);
+      } else if (level === 8) {
+        const removedWalls = Math.min(2, walls.length);
+        walls = walls.slice(removedWalls);
+        if (type === 'arrow') {
+          const d = findExitDirection(item.r, item.c);
+          if (d) item.d = d;
+        }
+        score += removedWalls * 40;
+        show(`Lv.8: ${removedWalls} duvar kaldırıldı ve akış hızlandı.`);
+      } else if (level === 9) {
+        walls = [];
+        let changed = 0;
+        arrows.forEach(a => {
+          const d = findExitDirection(a.r, a.c);
+          if (d && d !== a.d) { a.d = d; changed++; }
+        });
+        score += 250 + changed * 15;
+        show('Lv.9: Ekosistem dengelendi; tüm duvarlar kalktı.');
+      } else if (level >= 10) {
+        walls = [];
+        const removed = arrows.length;
+        arrows = [];
+        score += 500 + removed * 25;
+        show('Lv.10 Infinity: Tahta tamamen temizlendi.');
+      } else {
+        return false;
+      }
+
+      usePower(level);
+      render();
+      if (arrows.length === 0) setTimeout(advanceRound, 300);
+      return true;
+    }
+
     function saveCollection() {
       try {
         localStorage.setItem(SAVE_KEY, JSON.stringify({
-          c: collection, m: maxRound, s: score, b: best, r: round, hs: Math.max(highScore, score)
+          c: collection, m: maxRound, s: score, b: best, r: round, hs: Math.max(highScore, score), stats, daily
         }));
       } catch (e) {
         // localStorage yoksa sessizce devam et
@@ -1083,7 +1338,7 @@
       try {
         muted = localStorage.getItem('natureFlow_muted') === '1';
         const btn = document.getElementById('muteBtn');
-        if (btn) { btn.textContent = muted ? '🔇' : '🔊'; }
+        if (btn) { btn.innerHTML = muted ? ICONS.soundOff : ICONS.soundOn; }
       } catch (e) {}
 
       try {
@@ -1099,6 +1354,8 @@
               best = typeof data.b === 'number' ? data.b : 1;
               round = typeof data.r === 'number' ? data.r : 1;
               highScore = typeof data.hs === 'number' ? data.hs : 0;
+              if (data.stats && typeof data.stats === 'object') stats = {...stats, ...data.stats};
+              if (data.daily && typeof data.daily === 'object') daily = data.daily;
             } else {
               // Eski format: doğrudan koleksiyon nesnesi
               collection = data;
@@ -1123,6 +1380,8 @@
         // Sadece tur ve board sıfırlanır, koleksiyon korunur
         round = 1;
         merges = 0;
+        combo = 0;
+        lastActionAt = 0;
         score = 0;
         best = 1;
       }
@@ -1134,34 +1393,56 @@
       busy = false;
 
       const cells = [...Array(N * N).keys()].sort(() => Math.random() - 0.5);
+      const cfg = MODES[mode] || MODES.classic;
 
-      // Duvarlar tur atladıkça kademeli artar (tur başına +1, üst sınır 6) — ani sıçrama yok
-      const wallCount = isNextRound ? Math.min(round - 1, 6) : 0;
+      // Zaman Yarışı modunda her yeni tahta kendi geri sayımıyla başlar
+      if (cfg.timeRush) startRushTimer(); else stopRushTimer();
+
+      // Duvarlar tur atladıkça kademeli artar (mod bazlı adım/tavan) — ani sıçrama yok
+      const wallCount = isNextRound ? Math.min((round - 1) * cfg.wallStep, cfg.wallCap) : 0;
       for (let i = 0; i < wallCount; i++) {
         const p = cells.pop();
         walls.push({ id: 'w' + i, r: Math.floor(p / N), c: p % N });
       }
 
-      const availableCells = 16 - wallCount;
-      // Çıkışa bakan (çözülebilir) ok oranı yavaş yavaş azalır — oyun kademeli zorlaşır
-      const prob = Math.max(0.12, 0.42 - (round - 1) * 0.04);
+      const availableCells = 18 - wallCount;
+      // Çıkışa bakan (çözülebilir) ok oranı yavaş yavaş azalır — oyun kademeli zorlaşır (mod bazlı eğri)
+      const prob = Math.max(cfg.probFloor, cfg.probStart - (round - 1) * cfg.probStep);
 
+      // Oklar sırayla, o ana kadar tahtaya konan diğer okları/duvarları dikkate alarak üretilir:
+      // "prob" olasılığıyla bilinçli olarak AÇIK bir çıkışa yönlendirilir (kolay ok),
+      // geri kalanı tamamen rastgele yöne bakar (zorlaşan/çözüm gerektiren ok).
       cells.slice(0, availableCells).forEach((p, i) => {
         const r = Math.floor(p / N);
-        const c = p % N;
-        const d = Math.random() < prob ? (findExitDirection(r, c) || rand(['up', 'down', 'left', 'right'])) : rand(['up', 'down', 'left', 'right']);
+        const c = Math.floor(p % N);
+        let d;
+        if (Math.random() < prob) {
+          d = findExitDirection(r, c) || rand(['up', 'down', 'left', 'right']);
+        } else {
+          d = rand(['up', 'down', 'left', 'right']);
+        }
         arrows.push({ id: i, r, c, d, level: 1 });
       });
 
+      // Üretim sonrası en az bir oynanabilir ok garanti edilir.
+      preventDeadlock();
       render();
     }
 
     function advanceRound() {
+      // Zaman Yarışı modunda kalan süre bonus puana dönüşür
+      const cfg = MODES[mode] || MODES.classic;
+      if (cfg.timeRush && rushTimeLeft > 0) {
+        const bonus = rushTimeLeft * 5;
+        score += bonus;
+        show(`⏱️ Hız bonusu +${bonus} puan!`);
+      }
       // Tahta sıfırlandığında koleksiyona ekstra 1× Lv.5 ekle
       collection[5] = (collection[5] || 0) + 1;
       // Koleksiyonu SIFIRLAMADAN sadece tur ve board sıfırla
       round++;
       if (round > maxRound) maxRound = round; // progresyon kalıcı olur
+      stats.bestRound = Math.max(stats.bestRound, round);
       saveCollection();
       show('🎁 Tahta sıfırlandı! +1× Lv.5 Ecosystem koleksiyona eklendi.');
       sfx.round();
@@ -1173,48 +1454,26 @@
       if (busy) return;
 
       if (activePower) {
-        if (type === 'wall') {
-          walls = walls.filter(w => w.id !== item.id);
-          show('Duvar yıkıldı!');
-          sfx.power();
-          vibrate(15);
-          usePower(activePower);
-          render();
+        if (activePower >= 5) {
+          if (applyPower(activePower, type, item)) return;
+          show('Bu güç için uygun bir hedef seç.');
+          sfx.error();
           return;
         }
-
-        if (type === 'arrow') {
-          const openDir = findExitDirection(item.r, item.c);
-          if (!openDir) {
-            show('Tüm yönler kapalı');
-            sfx.error();
-            return;
-          }
-          if (openDir === item.d) {
-            show('Ok zaten açık yöne bakıyor');
-            return;
-          }
-          item.d = openDir;
-          show('Ok açık yöne döndürüldü!');
-          sfx.power();
-          vibrate(15);
-          usePower(activePower);
-          render();
-          return;
-        }
-
+        if (applyPower(activePower, type, item)) return;
+        show(activePower === 3 ? 'Lv.3 için bir ok seç.' : 'Lv.4 için bir duvar seç.');
+        sfx.error();
         return;
       }
 
       if (type === 'arrow') {
         if (getTotalItems() >= MAX_CAP) {
           el.animate([{ transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }], { duration: 180 });
-          show('Kapasite dolu! Lv.5+ güç kullanmalısın.');
+          show('Kapasite dolu! Bir güç veya merge kullan.');
           sfx.error();
           vibrate(25);
           return;
         }
-
         if (!canExit(item)) {
           el.animate([{ transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }], { duration: 180 });
           show('Yol kapalı');
@@ -1224,6 +1483,7 @@
         }
 
         busy = true;
+        const multiplier = registerCombo();
         const [dr, dc] = dirs[item.d];
         el.style.setProperty('--dx', (dc * (N * 70)) + 'px');
         el.style.setProperty('--dy', (dr * (N * 70)) + 'px');
@@ -1231,13 +1491,33 @@
 
         setTimeout(() => {
           arrows = arrows.filter(x => x.id !== item.id);
-          score += item.level * 10;
-          addEvent(item.level);
+          const gained = item.level * 10 * multiplier;
+          score += gained;
+          addEvent(item.level, multiplier);
+          if (multiplier > 1) { show(`Combo ×${multiplier} · +${gained} puan`); sfx.combo(); }
           busy = false;
           render();
 
           if (arrows.length === 0) setTimeout(advanceRound, 300);
+          else if (!hasPlayableArrow() && !hasUsablePower()) show('Akış tıkandı — koleksiyondaki güçleri kullan.');
         }, 400);
+      }
+    }
+
+    function hasPlayableArrow() {
+      return arrows.some(a => canExit(a));
+    }
+
+    function hasUsablePower() {
+      return Object.keys(collection).some(l => Number(l) >= getMinPowerLevel());
+    }
+
+    function preventDeadlock() {
+      if (!arrows.length || hasPlayableArrow()) return;
+      // Tahta üretiminde tamamen kilitlenmeyi engelle: en az bir okun gerçek çıkış yönünü bul.
+      for (const a of arrows) {
+        const d = findExitDirection(a.r, a.c);
+        if (d) { a.d = d; return; }
       }
     }
 
@@ -1283,6 +1563,7 @@
       updateHud();
       renderCollection();
       checkDeadlock();
+      checkNewAchievements();
     }
 
     // ---- Kilitlenme (deadlock) kontrolü ----
@@ -1302,12 +1583,99 @@
 
     function showGameOver() {
       if (timerInterval) clearInterval(timerInterval);
+      stopRushTimer();
       sfx.gameover();
       vibrate([20, 40, 20, 40, 20]);
       document.getElementById('goScore').textContent = score;
       document.getElementById('goRound').textContent = round;
       document.getElementById('goBest').textContent = 'Lv.' + best;
+
+      const title = document.getElementById('goTitle');
+      const sub = document.getElementById('goSub');
+      if (gameOverReason === 'time') {
+        title.textContent = '⏱️ Süre Doldu';
+        sub.textContent = 'Bu turu vaktinde bitiremedin. Zaman Yarışı acımasızdır — bir dahaki sefere!';
+      } else {
+        title.textContent = '🍂 Hamle Kalmadı';
+        sub.textContent = 'Tahtada oynanabilir bir ok kalmadı ve elindeki güçler bunu açamıyor.';
+      }
+      gameOverReason = 'deadlock';
       document.getElementById('gameOverModal').classList.add('show');
+    }
+
+    function getDailyChallenge() {
+      const day = new Date().toISOString().slice(0,10);
+      if (!daily || daily.date !== day) {
+        const ids = ['arrows','merges','combo','round','powers','level'];
+        const id = ids[Number(day.replaceAll('-','')) % ids.length];
+        daily = {date:day, id, claimed:false, startArrows:stats.arrows, startMerges:stats.merges, startPowers:stats.powers};
+        saveCollection();
+      }
+      return daily;
+    }
+
+    function renderDailyChallenge() {
+      const box = document.getElementById('dailyChallenge'); if (!box) return;
+      const d = getDailyChallenge();
+      const defs = {
+        arrows: ['25 ok çıkar', 25, () => stats.arrows - (d.startArrows || 0)],
+        merges: ['5 merge yap', 5, () => stats.merges - (d.startMerges || 0)],
+        combo: ['×5 combo yap', 5, () => stats.bestCombo],
+        round: ['5. tura ulaş', 5, () => stats.bestRound],
+        powers: ['5 güç kullan', 5, () => stats.powers - (d.startPowers || 0)],
+        level: ['Lv.6 element üret', 6, () => stats.bestLevel]
+      };
+      const [text,target,value] = defs[d.id] || defs.arrows;
+      const current = Math.min(target,value());
+      const done = current >= target;
+      if (done && !d.claimed) { d.claimed=true; score += 150; stats.bestScore=Math.max(stats.bestScore,score); saveCollection(); show('Günlük görev tamamlandı! +150 puan'); sfx.challenge(); }
+      box.innerHTML = `<div class="challenge-title">Günlük görev</div><div class="challenge-text">${d.claimed ? 'Tamamlandı — yarın yeni görev.' : text}</div><div class="challenge-progress">${current}/${target}</div>`;
+    }
+
+    const achievementDefs = [
+      ['İlk Akış','İlk oku dışarı çıkar.',()=>stats.arrows>=1],
+      ["İlk Büyüme","İlk merge'ini yap.",()=>stats.merges>=1],
+      ['Dayanıklı','5. tura ulaş.',()=>stats.bestRound>=5],
+      ['Akış Ustası','×5 combo yap.',()=>stats.bestCombo>=5],
+      ['Ekosistem','Lv.7 element üret.',()=>stats.bestLevel>=7],
+      ['Binlik','1000 puana ulaş.',()=>stats.bestScore>=1000],
+      ['Kalıcı Bahçe','10. tura ulaş.',()=>stats.bestRound>=10],
+      ['Sonsuzluk','Lv.10 (Infinity) element üret.',()=>stats.bestLevel>=10],
+      ['Beş Bin','5000 puana ulaş.',()=>stats.bestScore>=5000],
+      ['Güç Ustası','Toplam 20 güç kullan.',()=>stats.powers>=20],
+      ['Maraton','Toplamda 200 ok çıkar.',()=>stats.arrows>=200],
+      ['Merge Makinesi','Toplamda 50 merge yap.',()=>stats.merges>=50]
+    ];
+
+    // ---- Başarım kilidi açılınca bildirim (Sound design / Polish) ----
+    const ACH_SAVE_KEY = 'natureFlow_unlockedAch_v1';
+    let unlockedAchievements = [];
+    function loadAchievementState() {
+      try {
+        const raw = localStorage.getItem(ACH_SAVE_KEY);
+        if (raw) unlockedAchievements = JSON.parse(raw) || [];
+      } catch (e) { unlockedAchievements = []; }
+    }
+    function saveAchievementState() {
+      try { localStorage.setItem(ACH_SAVE_KEY, JSON.stringify(unlockedAchievements)); } catch (e) {}
+    }
+    function checkNewAchievements() {
+      achievementDefs.forEach(([title, , fn], idx) => {
+        if (fn() && !unlockedAchievements.includes(idx)) {
+          unlockedAchievements.push(idx);
+          saveAchievementState();
+          show(`🏅 Başarım: ${title}`);
+          sfx.achievement();
+        }
+      });
+    }
+    function renderStats() {
+      const g=document.getElementById('statsGrid'); if(!g)return;
+      g.innerHTML=[['bestRound','En yüksek tur'],['bestLevel','En yüksek seviye'],['bestScore','En yüksek puan'],['bestCombo','En iyi combo'],['arrows','Çıkan ok'],['merges','Merge'],['powers','Kullanılan güç']].map(([k,l])=>`<div class="stat-box"><div class="n">${stats[k]||0}</div><div class="l">${l}</div></div>`).join('');
+    }
+    function renderAchievements() {
+      const list=document.getElementById('achievementList'); if(!list)return;
+      list.innerHTML=achievementDefs.map(([title,desc,fn])=>{const ok=fn();return `<li class="achievement ${ok?'':'locked'}"><span class="ai">${ok?'✓':'○'}</span><div><div class="at">${title}</div><div class="ad">${desc}</div></div></li>`}).join('');
     }
 
     function renderCollection() {
@@ -1345,7 +1713,8 @@
         e.innerHTML =
           `<div class="emoji">${icons[Math.min(l - 1, icons.length - 1)]}</div>
            <div class="lv">Lv.${l} × ${collection[l]}</div>
-           <div class="name">${itemName}</div>`;
+           <div class="name">${itemName}</div>
+           <div class="power-info">${isPowerCapable ? powerDescriptions[l] : '2 tane olunca bir üst seviyeye birleşir.'}</div>`;
 
         const activate = () => {
           if (isPowerCapable) {
@@ -1370,7 +1739,57 @@
         c.appendChild(e);
         requestAnimationFrame(() => e.classList.add('merge'));
       });
+      renderDailyChallenge();
     }
+
+    // ---- Board modu seçimi ----
+    function loadMode() {
+      try {
+        const saved = localStorage.getItem(MODE_SAVE_KEY);
+        if (saved && MODES[saved]) mode = saved;
+      } catch (e) {}
+    }
+
+    function saveMode() {
+      try { localStorage.setItem(MODE_SAVE_KEY, mode); } catch (e) {}
+    }
+
+    function renderModeList() {
+      const list = document.getElementById('modeList');
+      if (!list) return;
+      list.innerHTML = Object.keys(MODES).map(key => {
+        const m = MODES[key];
+        const active = key === mode;
+        return `<li class="achievement${active ? '' : ' locked'}" data-mode="${key}" style="cursor:pointer" tabindex="0" role="button">
+          <span class="ai">${active ? '✓' : '○'}</span>
+          <div><div class="at">${m.label}</div><div class="ad">${m.desc}</div></div>
+        </li>`;
+      }).join('');
+      list.querySelectorAll('li').forEach(li => {
+        const pick = () => selectMode(li.getAttribute('data-mode'));
+        li.onclick = pick;
+        li.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } };
+      });
+    }
+
+    function selectMode(key) {
+      if (!MODES[key] || key === mode) {
+        document.getElementById('modeModal').classList.remove('show');
+        return;
+      }
+      mode = key;
+      saveMode();
+      highScore = Math.max(highScore, score);
+      document.getElementById('gameOverModal').classList.remove('show');
+      document.getElementById('modeModal').classList.remove('show');
+      initBoardData(false, true);
+      saveCollection();
+      if (!MODES[mode].timeRush) startTimer();
+      show(`${MODES[mode].label} moduna geçildi — yeni oyun başladı.`);
+    }
+
+    document.getElementById('modeBtn').onclick = () => { renderModeList(); document.getElementById('modeModal').classList.add('show'); };
+    document.getElementById('closeModeBtn').onclick = () => document.getElementById('modeModal').classList.remove('show');
 
     document.getElementById('reset').onclick = () => {
       // Rekoru güncelle, koleksiyonu koruyarak oyunu sıfırla
@@ -1378,7 +1797,8 @@
       document.getElementById('gameOverModal').classList.remove('show');
       initBoardData(false, true);
       saveCollection();
-      startTimer();
+      // Zaman Yarışı'nda geri sayım initBoardData içinde zaten başlar; diğer modlarda toplam süreyi sıfırla.
+      if (!(MODES[mode] || MODES.classic).timeRush) startTimer();
     };
 
     document.getElementById('restartBtn').onclick = () => {
@@ -1407,18 +1827,42 @@
       updateHud();
     };
 
+    document.getElementById('statsBtn').onclick = () => { renderStats(); document.getElementById('statsModal').classList.add('show'); };
+    document.getElementById('closeStatsBtn').onclick = () => document.getElementById('statsModal').classList.remove('show');
+    document.getElementById('closeStatsBtn2').onclick = () => document.getElementById('statsModal').classList.remove('show');
+    document.getElementById('achievementsBtn').onclick = () => { renderAchievements(); document.getElementById('achievementsModal').classList.add('show'); };
+    document.getElementById('closeAchievementsBtn').onclick = () => document.getElementById('achievementsModal').classList.remove('show');
+    document.getElementById('closeAchievementsBtn2').onclick = () => document.getElementById('achievementsModal').classList.remove('show');
+
     // Ambiyans parçacıkları
     spawnFireflies();
+    applyStaticIcons();
 
-    // Başlangıçta koleksiyonu yükle (yoksa Lv.5 hediye et)
+    // Başlangıçta mod tercihini, koleksiyonu ve başarım durumunu yükle (yoksa Lv.5 hediye et)
+    loadMode();
+    loadAchievementState();
     loadCollection();
     initBoardData(false, false);
-    startTimer();
+    if (!(MODES[mode] || MODES.classic).timeRush) startTimer();
+
+    // ---- Startup / loading polish ----
+    // Gerçek bir asset yükleme yok (tek dosya), ama ani "flaş açılış" yerine
+    // kısa bir marka anı + yumuşak giriş animasyonu ile daha cilalı bir başlangıç hissi veriyoruz.
+    requestAnimationFrame(() => {
+      document.querySelector('.app').classList.add('ready');
+      setTimeout(() => {
+        const boot = document.getElementById('bootScreen');
+        if (boot) {
+          boot.classList.add('hide');
+          setTimeout(() => boot.remove(), 500);
+        }
+      }, 420);
+    });
 
     // İlk kez oynayan kullanıcıya "nasıl oynanır" göster
     try {
       if (!localStorage.getItem('natureFlow_seenHelp')) {
-        setTimeout(() => document.getElementById('helpModal').classList.add('show'), 400);
+        setTimeout(() => document.getElementById('helpModal').classList.add('show'), 1000);
       }
     } catch (e) {}
   </script>
