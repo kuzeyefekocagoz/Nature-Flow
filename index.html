@@ -2,13 +2,14 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#070f0b" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="description" content="Nature Flow — okları birleştir, tahtayı boşalt, doğal bir ekosistem büyüt." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BF%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="manifest.json" />
   <title>Nature Flow</title>
   <style>
     * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -93,9 +94,7 @@
       width: min(780px, 100%);
       max-width: 780px;
       padding: 16px 12px 28px;
-      background: rgba(10, 16, 26, 0.50);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(10, 16, 26, 0.84);
       border-radius: 32px;
       border: 1px solid rgba(120, 167, 255, 0.08);
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
@@ -236,6 +235,13 @@
 
     .btn-icon:active { transform: scale(0.92); }
 
+    .btn-icon:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none !important;
+      filter: none;
+    }
+
     .header-actions { display: flex; gap: 8px; align-items: center; flex: 0 0 auto; }
 
     .hud {
@@ -248,9 +254,7 @@
     }
 
     .card {
-      background: var(--bg-card);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      background: rgba(20, 34, 27, 0.92);
       border: 1px solid rgba(255, 255, 255, 0.04);
       border-radius: var(--radius-card);
       padding: 10px 16px;
@@ -287,14 +291,13 @@
     .game {
       display: grid;
       grid-template-columns: 1fr 190px;
+      align-items: start;
       gap: 16px;
     }
 
     .board {
       aspect-ratio: 1/1;
-      background: var(--bg-panel);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background: rgba(18, 30, 24, 0.94);
       border: 1px solid rgba(255, 255, 255, 0.04);
       border-radius: var(--radius-card);
       padding: 14px;
@@ -304,6 +307,7 @@
       position: relative;
       touch-action: manipulation;
       overflow: hidden; /* fırlayan oklar kart sınırlarının dışına taşıp "board'un altından bir şey çıkıyor" hissi vermesin */
+      contain: layout paint;
     }
 
     .cell {
@@ -329,7 +333,6 @@
       justify-content: center;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.25s, filter 0.25s;
-      will-change: transform, filter;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
       touch-action: manipulation;
     }
@@ -363,7 +366,6 @@
       justify-content: center;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.25s, filter 0.25s;
-      will-change: transform, opacity;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
       touch-action: manipulation;
     }
@@ -396,15 +398,14 @@
     .c8 { background: linear-gradient(145deg, #9ee57a, #7ac95a); }
 
     .side {
-      background: var(--bg-panel);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background: rgba(18, 30, 24, 0.94);
       border: 1px solid rgba(255, 255, 255, 0.04);
       border-radius: var(--radius-card);
       padding: 16px 14px;
       display: flex;
       flex-direction: column;
       box-shadow: var(--shadow-heavy);
+      contain: layout paint;
     }
 
     .side h2 {
@@ -513,7 +514,6 @@
       flex-direction: column;
       justify-content: center;
       transition: transform 0.2s, border-color 0.25s, box-shadow 0.25s, background 0.2s;
-      will-change: transform;
       cursor: default;
       position: relative;
       touch-action: manipulation;
@@ -575,6 +575,15 @@
       margin-top: 1px;
     }
 
+    .event .power-info {
+      font-size: 10px;
+      line-height: 1.3;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-top: 4px;
+      opacity: 0.85;
+    }
+
     .tip {
       font-size: 11px;
       line-height: 1.5;
@@ -591,10 +600,10 @@
 
     .merge { animation: chillMerge 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes chillMerge {
-      0% { transform: scale(0.70) rotate(-4deg); opacity: 0.4; filter: brightness(1.6); }
-      35% { transform: scale(1.16) rotate(3deg); opacity: 1; filter: brightness(1.35) drop-shadow(0 0 28px rgba(98, 214, 176, 0.6)); box-shadow: 0 0 0 6px rgba(98, 214, 176, 0.10); }
-      65% { transform: scale(0.96) rotate(-1deg); filter: brightness(1.15) drop-shadow(0 0 16px rgba(98, 214, 176, 0.35)); }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; filter: brightness(1) drop-shadow(0 0 0px transparent); box-shadow: none; }
+      0% { transform: scale(0.70) rotate(-4deg); opacity: 0.4; }
+      35% { transform: scale(1.16) rotate(3deg); opacity: 1; }
+      65% { transform: scale(0.96) rotate(-1deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
     }
 
     .fly {
@@ -603,10 +612,10 @@
     }
 
     @keyframes fly {
-      0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; filter: brightness(1.2) drop-shadow(0 0 20px rgba(120, 167, 255, 0.3)); }
-      15% { transform: translate(calc(var(--dx) * 0.02), calc(var(--dy) * 0.02)) scale(1.12) rotate(-8deg); filter: brightness(1.4) drop-shadow(0 0 26px rgba(120, 167, 255, 0.5)); }
-      55% { opacity: 0.95; filter: brightness(1.7) drop-shadow(0 0 44px rgba(120, 167, 255, 0.65)); }
-      100% { transform: translate(var(--dx), var(--dy)) scale(0.1) rotate(340deg); opacity: 0; filter: brightness(2.1) drop-shadow(0 0 60px rgba(120, 167, 255, 0.8)); }
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+      15% { transform: translate(calc(var(--dx) * 0.02), calc(var(--dy) * 0.02)) scale(1.12) rotate(-8deg); }
+      55% { opacity: 0.95; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0.1) rotate(340deg); opacity: 0; }
     }
 
     .toast {
@@ -719,6 +728,26 @@
 
     .modal-btn:active { transform: scale(0.97); }
 
+
+    .reset-progress-btn {
+      width: 100%;
+      margin-top: 9px;
+      border: 1px solid rgba(255, 141, 154, 0.25);
+      background: rgba(255, 141, 154, 0.05);
+      color: #ffb1ba;
+      border-radius: 999px;
+      padding: 10px 13px;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: pointer;
+      min-height: 40px;
+      transition: var(--transition-smooth);
+    }
+    .reset-progress-btn:hover {
+      border-color: rgba(255, 141, 154, 0.55);
+      background: rgba(255, 141, 154, 0.10);
+    }
+
     .modal-close {
       position: absolute;
       top: 14px;
@@ -776,7 +805,7 @@
       header { margin-bottom: 10px; }
       header h1 { font-size: 18px; }
       .sub { font-size: 11px; }
-      .game { grid-template-columns: 1fr 170px; gap: 10px; }
+      .game { grid-template-columns: 1fr 170px; align-items: start; gap: 10px; }
       .board { max-height: 78vh; }
       .side { padding: 10px; }
       .collection { grid-template-columns: repeat(4, 1fr); gap: 6px; }
@@ -791,26 +820,11 @@
     }
 
     @supports not (backdrop-filter: blur(1px)) {
-      .app, .board, .side, .card, .toast, .btn-reset { background-color: rgba(18, 26, 40, 0.92); }
+      .toast, .btn-reset { background-color: rgba(18, 26, 40, 0.92); }
     }
-
-    .power-info { font-size: 9px; line-height: 1.25; color: var(--text-muted); margin-top: 3px; padding: 0 3px; }
-    .toolbar { display:flex; gap:8px; margin-top:12px; }
-    .tool-btn { flex:1; border:1px solid rgba(120,167,255,.14); background:rgba(120,167,255,.07); color:var(--text-primary); border-radius:12px; padding:9px 6px; font-size:11px; cursor:pointer; }
-    .challenge { margin-top:12px; padding:10px; border-radius:14px; background:rgba(98,214,176,.06); border:1px solid rgba(98,214,176,.12); }
-    .challenge-title { font-size:10px; color:var(--accent-cyan); font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
-    .challenge-text { font-size:11px; margin-top:4px; line-height:1.4; }
-    .challenge-progress { font-size:10px; color:var(--text-muted); margin-top:4px; }
-    .achievement { display:flex; align-items:center; gap:10px; padding:9px; border-radius:12px; background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.04); }
-    .achievement.locked { opacity:.42; }
-    .achievement .ai { font-size:20px; width:28px; text-align:center; }
-    .achievement .at { font-size:11px; font-weight:700; }
-    .achievement .ad { font-size:10px; color:var(--text-muted); margin-top:2px; }
-    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .stat-box { background:rgba(255,255,255,.035); border-radius:12px; padding:10px; }
-    .stat-box .n { font-size:18px; font-weight:800; color:var(--accent-gold); }
-    .stat-box .l { font-size:9px; color:var(--text-muted); margin-top:2px; }
-  </style>
+  
+@media (max-width:700px){html,body{width:100%;min-width:0;overflow-x:hidden;overscroll-behavior-x:none}body{-webkit-tap-highlight-color:transparent;touch-action:manipulation;align-items:flex-start;padding-top:max(14px, env(safe-area-inset-top));padding-bottom:max(14px, env(safe-area-inset-bottom))}:root{--shadow-heavy: 0 8px 20px rgba(0, 0, 0, 0.45);}.app{width:100%;max-width:100%;min-width:0;padding:8px;box-sizing:border-box;contain:layout paint}header{gap:6px;flex-wrap:wrap}.brand{min-width:0;flex:1}.brand h1{font-size:clamp(17px,5vw,22px)}.hud{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;order:3}.hud .card{min-width:0;padding:6px 3px;border-radius:9px}.hud .label{font-size:7px;white-space:nowrap}.hud .value{font-size:12px}.header-actions{gap:4px}.btn-icon,.btn-reset{width:34px;height:34px;min-width:34px}.btn-icon#undoBtn{font-size:19px}.game{display:flex;flex-direction:column;gap:9px;width:100%;min-width:0}.board{width:min(100%,430px);max-width:100%;aspect-ratio:1;margin:0 auto;contain:layout paint;transform:translateZ(0)}.cell{contain:layout paint}.fireflies{opacity:.3;pointer-events:none}.side{width:100%;min-width:0;box-sizing:border-box;padding:9px}.side h2{font-size:13px;margin-bottom:6px}.collection{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.collection .item{min-width:0;padding:6px;border-radius:9px}.collection .power-info,.collection .info,.collection .desc,.collection .description{font-size:7px!important;line-height:1.15!important;margin-top:2px!important;padding:0!important;opacity:.45;letter-spacing:0}.collection .name{font-size:9px}.collection .level,.collection .lv{font-size:8px}.power-banner{padding:7px 8px;font-size:9px}.toolbar{gap:6px}.tool-btn{padding:8px 5px;font-size:10px}.tip{font-size:8px;line-height:1.25}.modal{width:calc(100vw - 20px);max-width:460px;max-height:calc(100dvh - 20px);overflow-y:auto;box-sizing:border-box;-webkit-overflow-scrolling:touch}.modal-overlay{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.toast{max-width:calc(100vw - 24px);font-size:10px}}@media(max-width:430px){.app{padding:6px}.board{width:min(100%,390px)}.collection{gap:5px}.collection .item{padding:5px}.collection .power-info,.collection .info,.collection .desc,.collection .description{font-size:6.5px!important;opacity:.4}}@media(max-width:360px){.hud{grid-template-columns:repeat(2,minmax(0,1fr))}.board{width:100%}}
+</style>
 </head>
 <body>
   <div id="bootScreen"><div class="boot-leaf">🌿</div><div class="boot-text">Ekosistem hazırlanıyor</div></div>
@@ -819,7 +833,7 @@
   <div class="app">
     <header>
       <div class="brand">
-        <h1>🌿Nature Flow</h1>
+        <h1>Nature Flow</h1>
         <div class="sub">Tur <span id="round">1</span></div>
       </div>
       <div class="hud">
@@ -829,6 +843,7 @@
         <div class="card"><div class="label">Puan</div><div class="value" id="score">0</div></div>
       </div>
       <div class="header-actions">
+        <button class="btn-icon" id="undoBtn" aria-label="Son hamleyi geri al" title="Son hamleyi geri al" disabled>↶</button>
         <button class="btn-icon" id="modeBtn" aria-label="Mod seç" title="Mod seç"></button>
         <button class="btn-icon" id="muteBtn" aria-label="Sesi kapat/aç" title="Sesi kapat/aç"></button>
         <button class="btn-icon" id="helpBtn" aria-label="Nasıl oynanır" title="Nasıl oynanır"></button>
@@ -839,19 +854,13 @@
     <div class="game">
       <div id="board" class="board" role="grid" aria-label="Oyun tahtası"></div>
       <aside class="side">
-        <h2>🌱 Koleksiyon <span class="cap-badge" id="capBadge">📦 0/8</span></h2>
+        <h2>Koleksiyon <span class="cap-badge" id="capBadge">0/8</span></h2>
         <div class="power-banner" id="powerBanner">
           <span id="powerBannerText">Güç seçili</span>
           <button id="cancelPowerBtn">İptal ✕</button>
         </div>
         <div id="collection" class="collection" role="list"></div>
-        <div id="dailyChallenge" class="challenge"></div>
-        <div class="toolbar">
-          <button class="tool-btn" id="statsBtn">İstatistikler</button>
-          <button class="tool-btn" id="achievementsBtn">Başarımlar</button>
-        </div>
-        <div class="tip"><b>Güçler:</b> Element kartında ne yaptığını görebilirsin.</div>
-      </aside>
+</aside>
     </div>
   </div>
 
@@ -860,42 +869,26 @@
   <div class="modal-overlay" id="helpModal">
     <div class="modal">
       <button class="btn-icon modal-close" id="closeHelpBtn" aria-label="Kapat">✕</button>
-      <h2>🌿 Nasıl Oynanır</h2>
+      <h2>Nasıl Oynanır</h2>
       <div class="modal-sub">Tahtayı boşalt, elementleri büyüt.</div>
       <ul>
-        <li><span class="ico">👆</span><div>Bir <b>ok</b>a tıkla — baktığı yönde tahtanın dışına çıkabiliyorsa fırlar ve koleksiyona eklenir.</div></li>
-        <li><span class="ico">🔗</span><div>Aynı seviyeden <b>2 element</b> koleksiyonda birleşip bir üst seviyeye yükselir (🌰→🌸→🌳→…).</div></li>
-        <li><span class="ico">✨</span><div><b>Güçler:</b> Lv.3 oku döndürür; Lv.4 duvar kırar; Lv.5 satır; Lv.6 sütun temizler; Lv.7 üç okun yönünü düzeltir; Lv.8 iki duvar kaldırır; Lv.9 tüm duvarları kaldırır; Lv.10 tahtayı tamamen temizler.</div></li>
-        <li><span class="ico">♾️</span><div><b>Lv.9 (Infinity)</b> gücü tüm Lv.5+ elementleri siler — dikkatli kullan!</div></li>
-        <li><span class="ico">🧱</span><div>Her turda tahtaya bir <b>duvar</b> daha eklenir, zorluk kademeli artar.</div></li>
-        <li><span class="ico">📦</span><div>Koleksiyon kapasitesi <b>8</b> ile sınırlı — dolarsa güç kullanmadan yeni ok toplayamazsın.</div></li>
-        <li><span class="ico">🗺️</span><div><b>Board Modu:</b> üstteki 🗺️ butonuyla Klasik, Zen (duvarsız/rahat) veya Zaman Yarışı (tur başına süre sınırı) arasında geçiş yapabilirsin.</div></li>
+        <li><span class="ico">1</span><div>Bir <b>ok</b>a tıkla — baktığı yönde tahtanın dışına çıkabiliyorsa fırlar ve koleksiyona eklenir.</div></li>
+        <li><span class="ico">2</span><div>Aynı seviyeden <b>2 element</b> koleksiyonda birleşip bir üst seviyeye yükselir (🌰→🌸→🌳→…).</div></li>
+        <li><span class="ico">3</span><div><b>Güçler:</b> Lv.3 oku döndürür; Lv.4 duvar kırar; Lv.5 satır; Lv.6 sütun temizler; Lv.7 üç okun yönünü düzeltir; Lv.8 seçtiğin duvarı öncelikli kaldırır ve toplam 2 duvarı temizler; Lv.9 tüm duvarları kaldırır; Lv.10 tahtayı tamamen temizler.</div></li>
+        <li><span class="ico">4</span><div>Her turda tahtaya bir <b>duvar</b> daha eklenir, zorluk kademeli artar.</div></li>
+        <li><span class="ico">5</span><div>Koleksiyon kapasitesi <b>8</b> ile sınırlı — dolarsa güç kullanmadan yeni ok toplayamazsın.</div></li>
+        <li><span class="ico">6</span><div><b>Board Modu:</b> üstteki 🗺️ butonuyla Klasik, Zen (duvarsız; 18. turdan sonra hafif zorluk artışı) veya Zaman Yarışı (tur başına süre sınırı) arasında geçiş yapabilirsin.</div></li>
       </ul>
       <button class="modal-btn" id="startPlayingBtn">Anladım, oynayalım</button>
+      <button class="reset-progress-btn" id="clearDataBtn" type="button">İlerlemeyi sıfırla</button>
     </div>
   </div>
 
-  <div class="modal-overlay" id="statsModal">
-    <div class="modal">
-      <button class="btn-icon modal-close" id="closeStatsBtn" aria-label="Kapat">✕</button>
-      <h2>İstatistikler</h2><div class="modal-sub">Nature Flow ilerlemen</div>
-      <div class="stats-grid" id="statsGrid"></div>
-      <button class="modal-btn" id="closeStatsBtn2" style="margin-top:14px">Kapat</button>
-    </div>
-  </div>
-  <div class="modal-overlay" id="achievementsModal">
-    <div class="modal">
-      <button class="btn-icon modal-close" id="closeAchievementsBtn" aria-label="Kapat">✕</button>
-      <h2>Başarımlar</h2><div class="modal-sub">Oynadıkça yeni hedefler açılır.</div>
-      <ul id="achievementList" style="gap:8px"></ul>
-      <button class="modal-btn" id="closeAchievementsBtn2">Kapat</button>
-    </div>
-  </div>
 
   <div class="modal-overlay" id="modeModal">
     <div class="modal">
       <button class="btn-icon modal-close" id="closeModeBtn" aria-label="Kapat">✕</button>
-      <h2>🗺️ Board Modu</h2>
+      <h2>Board Modu</h2>
       <div class="modal-sub">Mod değiştirmek mevcut oyunu sıfırlar (koleksiyonun korunur).</div>
       <ul id="modeList" style="gap:8px; list-style:none;"></ul>
     </div>
@@ -903,12 +896,13 @@
 
   <div class="modal-overlay" id="gameOverModal">
     <div class="modal">
-      <h2 id="goTitle">🍂 Hamle Kalmadı</h2>
+      <h2 id="goTitle">Hamle Kalmadı</h2>
       <div class="modal-sub" id="goSub">Tahtada oynanabilir bir ok kalmadı ve elindeki güçler bunu açamıyor.</div>
       <div class="stat-row">
         <div class="stat"><div class="n" id="goScore">0</div><div class="l">Puan</div></div>
         <div class="stat"><div class="n" id="goRound">1</div><div class="l">Tur</div></div>
         <div class="stat"><div class="n" id="goBest">Lv.1</div><div class="l">En Yüksek</div></div>
+        <div class="stat"><div class="n" id="goCombo">×0</div><div class="l">En İyi Combo</div></div>
       </div>
       <button class="modal-btn" id="restartBtn">Yeni Oyun Başlat</button>
     </div>
@@ -927,20 +921,18 @@
 
     const names = ['Seed', 'Flower', 'Tree', 'Forest', 'Ecosystem', 'Planet', 'Star', 'Galaxy', 'Universe', 'Infinity'];
     const icons = ['🌰', '🌸', '🌳', '🌲', '🦋', '🌍', '☀️', '🌌', '♾️', '✨'];
-    const powerDescriptions = {3:'Bir oku açık çıkış yönüne çevir.',4:'Seçtiğin duvarı kaldır.',5:'Seçtiğin satırdaki tüm okları temizle.',6:'Seçtiğin sütundaki tüm okları temizle.',7:'En fazla 3 okun yönünü düzelt.',8:'2 duvarı kaldır ve seçilen oku aç.',9:'Tüm duvarları kaldır ve kapalı okların yönlerini düzelt.',10:'Tahtadaki tüm okları ve duvarları temizle.'};
+    const powerDescriptions = {3:'Bir oku açık çıkış yönüne çevir.',4:'Seçtiğin duvarı kaldır.',5:'Seçtiğin satırdaki tüm okları temizle.',6:'Seçtiğin sütundaki tüm okları temizle.',7:'En fazla 3 okun yönünü düzelt.',8:'Seçtiğin duvarı ve bir duvarı daha kaldırır; ok seçersen 2 duvar kaldırır ve oku açar.',9:'Tüm duvarları kaldır ve kapalı okların yönlerini düzelt.',10:'Tahtadaki tüm okları ve duvarları temizle.'};
 
     // ---- Board modları ----
     // wallCap/wallStep: tur başına duvar artışı ve tavanı. probStart/probStep/probFloor: "kolay yönlü" ok üretme olasılığının tur bazlı düşüşü.
     const MODES = {
       classic: { label: '🌿 Klasik', desc: 'Dengeli zorluk artışı.', wallStep: 1, wallCap: 6, probStart: 0.42, probStep: 0.04, probFloor: 0.12, timeRush: false },
-      zen: { label: '🍃 Zen', desc: 'Duvar yok, sabit kolaylık — pratik ve rahatlama modu.', wallStep: 0, wallCap: 0, probStart: 0.55, probStep: 0, probFloor: 0.55, timeRush: false },
+      zen: { label: '🍃 Zen', desc: 'Duvar yok; 18. turdan sonra hafifçe zorlaşır.', wallStep: 0, wallCap: 0, probStart: 0.55, probStep: 0.018, probFloor: 0.30, timeRush: false },
       rush: { label: '⏱️ Zaman Yarışı', desc: 'Her tur için süre sınırı var, hızlı temizleyene bonus puan.', wallStep: 1, wallCap: 6, probStart: 0.42, probStep: 0.04, probFloor: 0.12, timeRush: true, roundSeconds: 40 }
     };
     const MODE_SAVE_KEY = 'natureFlow_mode_v1';
     let mode = 'classic';
 
-    let stats = {arrows:0, merges:0, bestRound:1, bestCombo:0, bestLevel:1, bestScore:0, powers:0};
-    let daily = null;
 
     let arrows = [];
     let walls = [];
@@ -956,6 +948,8 @@
     let startTime = Date.now();
     let timerInterval = null;
     let muted = false;
+    // İstatistikler artık arayüzde gösterilmiyor, ancak combo sistemi bunları kullanıyor.
+    let stats = { bestCombo: 0 };
     let toastQueue = [];
     let toastBusy = false;
     let combo = 0;
@@ -964,8 +958,15 @@
     let rushTimeLeft = 0;
     let rushInterval = null;
     let gameOverReason = 'deadlock';
+    const UNDO_LIMIT = 20;
+    let undoStack = [];
+    let pendingRoundTimeout = null;
 
     function rand(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+    function formatNumber(value) {
+      return Number(value || 0).toLocaleString('tr-TR');
+    }
 
     // ---- Titreşim (haptic) ----
     function vibrate(pattern) {
@@ -1008,9 +1009,7 @@
       power: () => { playTone(340, 0.1, 'square', 0.05); playTone(500, 0.14, 'square', 0.05, 0.07); },
       round: () => { playTone(440, 0.12, 'sine', 0.07); playTone(660, 0.14, 'sine', 0.07, 0.1); playTone(880, 0.2, 'sine', 0.06, 0.2); },
       gameover: () => { playTone(300, 0.2, 'sine', 0.07); playTone(220, 0.3, 'sine', 0.06, 0.18); },
-      combo: () => { playTone(720, 0.09, 'triangle', 0.06); playTone(960, 0.1, 'triangle', 0.06, 0.05); playTone(1200, 0.12, 'triangle', 0.05, 0.1); },
-      challenge: () => { playTone(520, 0.12, 'sine', 0.08); playTone(780, 0.14, 'sine', 0.07, 0.08); playTone(1040, 0.18, 'sine', 0.06, 0.16); },
-      achievement: () => { playTone(600, 0.1, 'triangle', 0.07); playTone(900, 0.12, 'triangle', 0.07, 0.09); playTone(1200, 0.16, 'triangle', 0.06, 0.18); playTone(1500, 0.22, 'sine', 0.05, 0.28); }
+      combo: () => { playTone(720, 0.09, 'triangle', 0.06); playTone(960, 0.1, 'triangle', 0.06, 0.05); playTone(1200, 0.12, 'triangle', 0.05, 0.1); }
     };
 
     // ---- SVG ikonlar (emoji yerine — Polish: madde 13/14) ----
@@ -1122,10 +1121,19 @@
       const ss = String(t % 60).padStart(2, '0');
       el.textContent = mm + ':' + ss;
       el.style.color = t <= 10 ? 'var(--accent-rose)' : '';
+      el.parentElement?.classList.toggle('warning', t <= 5);
+      if (t <= 3 && t > 0) {
+        playTone(620, 0.08, 'square', 0.035);
+        vibrate(18);
+      }
     }
 
     function show(msg) {
       toastQueue.push(msg);
+      // Kuyruk çok uzarsa (hızlı art arda combo/güç mesajları), en eskileri at —
+      // aksi halde toast oyuncu durduktan çok sonra bile arka arkaya açılıp
+      // kapanmaya devam eder ve gereksiz yere sürekli reflow/paint tetikler.
+      if (toastQueue.length > 2) toastQueue.splice(0, toastQueue.length - 2);
       if (!toastBusy) processToastQueue();
     }
 
@@ -1138,8 +1146,8 @@
       t.classList.add('show');
       setTimeout(() => {
         t.classList.remove('show');
-        setTimeout(processToastQueue, 180);
-      }, 1300);
+        setTimeout(processToastQueue, 150);
+      }, 1100);
     }
 
     function occupied(r, c, ignoreId = -1) {
@@ -1179,8 +1187,8 @@
 
     function updateHud() {
       document.getElementById('best').textContent = 'Lv. ' + best;
-      document.getElementById('score').textContent = score;
-      document.getElementById('highscore').textContent = Math.max(highScore, score);
+      document.getElementById('score').textContent = formatNumber(score);
+      document.getElementById('highscore').textContent = formatNumber(Math.max(highScore, score));
 
       // Kapasite rozeti koleksiyon başlığında
       const cap = getTotalItems();
@@ -1193,7 +1201,7 @@
       const bannerText = document.getElementById('powerBannerText');
       if (activePower) {
         banner.classList.add('active');
-        bannerText.textContent = (activePower === 9 ? '♾️ Infinity gücü seçili — bir duvara/oka dokun (tüm Lv.5+ harcanır)' : 'Lv.' + activePower + ' güç seçili — bir duvara veya oka dokun');
+        bannerText.textContent = (activePower === 9 ? '♾️ Infinity gücü seçili — bir duvara/oka dokun (tüm Lv.5+ harcanır)' : activePower === 8 ? 'Lv.8 güç seçili — bir duvara dokun (o duvar öncelikli) veya bir oka dokun' : 'Lv.' + activePower + ' güç seçili — bir duvara veya oka dokun');
       } else {
         banner.classList.remove('active');
       }
@@ -1205,6 +1213,7 @@
       else combo = 1;
       lastActionAt = now;
       stats.bestCombo = Math.max(stats.bestCombo, combo);
+      if (stats.bestCombo > 0) saveCollection();
       clearTimeout(comboTimer);
       comboTimer = setTimeout(() => { combo = 0; }, 2300);
       return Math.max(1, combo);
@@ -1212,8 +1221,6 @@
 
     function addEvent(level, comboMultiplier = 1) {
       collection[level] = (collection[level] || 0) + 1;
-      stats.arrows++;
-      stats.bestLevel = Math.max(stats.bestLevel, level);
       sfx.fly();
       vibrate(10);
 
@@ -1252,7 +1259,6 @@
 
     function usePower(costLevel) {
       if (!collection[costLevel]) return;
-      stats.powers++;
       collection[costLevel]--;
       if (collection[costLevel] <= 0) delete collection[costLevel];
       saveCollection();
@@ -1261,28 +1267,107 @@
       renderCollection();
     }
 
+
+    function cloneGameState() {
+      return {
+        arrows: arrows.map(a => ({ ...a })),
+        walls: walls.map(w => ({ ...w })),
+        collection: { ...collection },
+        merges,
+        score,
+        best,
+        round,
+        maxRound,
+        activePower,
+        combo,
+        lastActionAt,
+        rushTimeLeft,
+        gameOverReason
+      };
+    }
+
+    function pushUndoState() {
+      undoStack.push(cloneGameState());
+      if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+      updateUndoButton();
+    }
+
+    function updateUndoButton() {
+      const btn = document.getElementById('undoBtn');
+      if (!btn) return;
+      btn.disabled = busy || undoStack.length === 0;
+      btn.setAttribute('aria-label', undoStack.length ? 'Son hamleyi geri al' : 'Geri alınacak hamle yok');
+      btn.title = undoStack.length ? `Son hamleyi geri al (${undoStack.length})` : 'Geri alınacak hamle yok';
+    }
+
+    function restoreGameState(state) {
+      arrows = state.arrows.map(a => ({ ...a }));
+      walls = state.walls.map(w => ({ ...w }));
+      collection = { ...state.collection };
+      merges = state.merges;
+      score = state.score;
+      best = state.best;
+      round = state.round;
+      maxRound = state.maxRound;
+      activePower = state.activePower;
+      combo = state.combo;
+      lastActionAt = state.lastActionAt;
+      rushTimeLeft = state.rushTimeLeft;
+      gameOverReason = state.gameOverReason || 'deadlock';
+      busy = false;
+
+      if (pendingRoundTimeout) {
+        clearTimeout(pendingRoundTimeout);
+        pendingRoundTimeout = null;
+      }
+
+      document.getElementById('gameOverModal').classList.remove('show');
+      render();
+
+      const cfg = MODES[mode] || MODES.classic;
+      if (cfg.timeRush) startRushTimer();
+      else startTimer();
+
+      saveCollection();
+      updateUndoButton();
+    }
+
+    function undoLastMove() {
+      if (busy || !undoStack.length) return;
+      const state = undoStack.pop();
+      restoreGameState(state);
+      show('Son hamle geri alındı.');
+      sfx.power();
+      vibrate(18);
+    }
+
     function applyPower(level, type, item) {
       if (!item && level < 9) return false;
 
       if (level === 3 && type === 'arrow') {
         const openDir = findExitDirection(item.r, item.c);
         if (!openDir) return false;
+        pushUndoState();
         item.d = openDir;
         show('Lv.3: Ok açık çıkışa döndürüldü.');
       } else if (level === 4 && type === 'wall') {
+        pushUndoState();
         walls = walls.filter(w => w.id !== item.id);
         show('Lv.4: Duvar kırıldı.');
       } else if (level === 5 && type === 'arrow') {
+        pushUndoState()
         const removed = arrows.filter(a => a.r === item.r).length;
         arrows = arrows.filter(a => a.r !== item.r);
         score += removed * 15;
         show(`Lv.5: Satır temizlendi (${removed} ok).`);
       } else if (level === 6 && type === 'arrow') {
+        pushUndoState()
         const removed = arrows.filter(a => a.c === item.c).length;
         arrows = arrows.filter(a => a.c !== item.c);
         score += removed * 20;
         show(`Lv.6: Sütun temizlendi (${removed} ok).`);
       } else if (level === 7 && type === 'arrow') {
+        pushUndoState()
         let changed = 0;
         arrows.forEach(a => {
           if (changed >= 3) return;
@@ -1291,15 +1376,35 @@
         });
         show(`Lv.7: ${changed} ok için yol açıldı.`);
       } else if (level === 8) {
-        const removedWalls = Math.min(2, walls.length);
-        walls = walls.slice(removedWalls);
-        if (type === 'arrow') {
+        pushUndoState()
+        let removedWalls = 0;
+
+        if (type === 'wall') {
+          const clickedIndex = walls.findIndex(w => w.id === item.id);
+          if (clickedIndex < 0) return false;
+
+          // Tıklanan duvar her zaman ilk hedef; ikinci hedef kalanlardan seçilir.
+          const clickedWall = walls[clickedIndex];
+          const secondWall = walls.find(w => w.id !== clickedWall.id);
+          const removeIds = new Set([clickedWall.id, ...(secondWall ? [secondWall.id] : [])]);
+          walls = walls.filter(w => !removeIds.has(w.id));
+          removedWalls = removeIds.size;
+        } else if (type === 'arrow') {
+          const toRemove = walls.slice(0, 2);
+          const removeIds = new Set(toRemove.map(w => w.id));
+          walls = walls.filter(w => !removeIds.has(w.id));
+          removedWalls = toRemove.length;
+
           const d = findExitDirection(item.r, item.c);
           if (d) item.d = d;
+        } else {
+          return false;
         }
+
         score += removedWalls * 40;
-        show(`Lv.8: ${removedWalls} duvar kaldırıldı ve akış hızlandı.`);
+        show(`Lv.8: ${removedWalls} duvar kaldırıldı${type === 'wall' ? ' — seçtiğin duvar öncelikli' : ''} ve akış hızlandı.`);
       } else if (level === 9) {
+        pushUndoState()
         walls = [];
         let changed = 0;
         arrows.forEach(a => {
@@ -1309,6 +1414,7 @@
         score += 250 + changed * 15;
         show('Lv.9: Ekosistem dengelendi; tüm duvarlar kalktı.');
       } else if (level >= 10) {
+        pushUndoState()
         walls = [];
         const removed = arrows.length;
         arrows = [];
@@ -1320,14 +1426,14 @@
 
       usePower(level);
       render();
-      if (arrows.length === 0) setTimeout(advanceRound, 300);
+      if (arrows.length === 0) { pendingRoundTimeout = setTimeout(() => { pendingRoundTimeout = null; advanceRound(); }, 300); }
       return true;
     }
 
     function saveCollection() {
       try {
         localStorage.setItem(SAVE_KEY, JSON.stringify({
-          c: collection, m: maxRound, s: score, b: best, r: round, hs: Math.max(highScore, score), stats, daily
+          c: collection, m: maxRound, s: score, b: best, r: round, hs: Math.max(highScore, score), bc: stats.bestCombo
         }));
       } catch (e) {
         // localStorage yoksa sessizce devam et
@@ -1354,8 +1460,7 @@
               best = typeof data.b === 'number' ? data.b : 1;
               round = typeof data.r === 'number' ? data.r : 1;
               highScore = typeof data.hs === 'number' ? data.hs : 0;
-              if (data.stats && typeof data.stats === 'object') stats = {...stats, ...data.stats};
-              if (data.daily && typeof data.daily === 'object') daily = data.daily;
+              stats.bestCombo = typeof data.bc === 'number' ? data.bc : 0;
             } else {
               // Eski format: doğrudan koleksiyon nesnesi
               collection = data;
@@ -1375,7 +1480,7 @@
       return false;
     }
 
-    function initBoardData(isNextRound = false, resetCollection = false) {
+    function initBoardData(isNextRound = false, resetCollection = false, preserveUndo = false) {
       if (resetCollection) {
         // Sadece tur ve board sıfırlanır, koleksiyon korunur
         round = 1;
@@ -1391,6 +1496,8 @@
       walls = [];
       activePower = null;
       busy = false;
+      if (!preserveUndo) undoStack = [];
+      updateUndoButton();
 
       const cells = [...Array(N * N).keys()].sort(() => Math.random() - 0.5);
       const cfg = MODES[mode] || MODES.classic;
@@ -1442,12 +1549,11 @@
       // Koleksiyonu SIFIRLAMADAN sadece tur ve board sıfırla
       round++;
       if (round > maxRound) maxRound = round; // progresyon kalıcı olur
-      stats.bestRound = Math.max(stats.bestRound, round);
       saveCollection();
       show('🎁 Tahta sıfırlandı! +1× Lv.5 Ecosystem koleksiyona eklendi.');
       sfx.round();
       vibrate([10, 20, 10]);
-      initBoardData(true, false);
+      initBoardData(true, false, true);
     }
 
     function handleCellClick(type, item, el) {
@@ -1476,12 +1582,12 @@
         }
         if (!canExit(item)) {
           el.animate([{ transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }], { duration: 180 });
-          show('Yol kapalı');
           sfx.error();
           vibrate(25);
           return;
         }
 
+        pushUndoState();
         busy = true;
         const multiplier = registerCombo();
         const [dr, dc] = dirs[item.d];
@@ -1498,7 +1604,7 @@
           busy = false;
           render();
 
-          if (arrows.length === 0) setTimeout(advanceRound, 300);
+          if (arrows.length === 0) { pendingRoundTimeout = setTimeout(() => { pendingRoundTimeout = null; advanceRound(); }, 300); }
           else if (!hasPlayableArrow() && !hasUsablePower()) show('Akış tıkandı — koleksiyondaki güçleri kullan.');
         }, 400);
       }
@@ -1562,8 +1668,8 @@
 
       updateHud();
       renderCollection();
+      updateUndoButton();
       checkDeadlock();
-      checkNewAchievements();
     }
 
     // ---- Kilitlenme (deadlock) kontrolü ----
@@ -1586,9 +1692,10 @@
       stopRushTimer();
       sfx.gameover();
       vibrate([20, 40, 20, 40, 20]);
-      document.getElementById('goScore').textContent = score;
+      document.getElementById('goScore').textContent = formatNumber(score);
       document.getElementById('goRound').textContent = round;
       document.getElementById('goBest').textContent = 'Lv.' + best;
+      document.getElementById('goCombo').textContent = '×' + stats.bestCombo;
 
       const title = document.getElementById('goTitle');
       const sub = document.getElementById('goSub');
@@ -1602,82 +1709,6 @@
       gameOverReason = 'deadlock';
       document.getElementById('gameOverModal').classList.add('show');
     }
-
-    function getDailyChallenge() {
-      const day = new Date().toISOString().slice(0,10);
-      if (!daily || daily.date !== day) {
-        const ids = ['arrows','merges','combo','round','powers','level'];
-        const id = ids[Number(day.replaceAll('-','')) % ids.length];
-        daily = {date:day, id, claimed:false, startArrows:stats.arrows, startMerges:stats.merges, startPowers:stats.powers};
-        saveCollection();
-      }
-      return daily;
-    }
-
-    function renderDailyChallenge() {
-      const box = document.getElementById('dailyChallenge'); if (!box) return;
-      const d = getDailyChallenge();
-      const defs = {
-        arrows: ['25 ok çıkar', 25, () => stats.arrows - (d.startArrows || 0)],
-        merges: ['5 merge yap', 5, () => stats.merges - (d.startMerges || 0)],
-        combo: ['×5 combo yap', 5, () => stats.bestCombo],
-        round: ['5. tura ulaş', 5, () => stats.bestRound],
-        powers: ['5 güç kullan', 5, () => stats.powers - (d.startPowers || 0)],
-        level: ['Lv.6 element üret', 6, () => stats.bestLevel]
-      };
-      const [text,target,value] = defs[d.id] || defs.arrows;
-      const current = Math.min(target,value());
-      const done = current >= target;
-      if (done && !d.claimed) { d.claimed=true; score += 150; stats.bestScore=Math.max(stats.bestScore,score); saveCollection(); show('Günlük görev tamamlandı! +150 puan'); sfx.challenge(); }
-      box.innerHTML = `<div class="challenge-title">Günlük görev</div><div class="challenge-text">${d.claimed ? 'Tamamlandı — yarın yeni görev.' : text}</div><div class="challenge-progress">${current}/${target}</div>`;
-    }
-
-    const achievementDefs = [
-      ['İlk Akış','İlk oku dışarı çıkar.',()=>stats.arrows>=1],
-      ["İlk Büyüme","İlk merge'ini yap.",()=>stats.merges>=1],
-      ['Dayanıklı','5. tura ulaş.',()=>stats.bestRound>=5],
-      ['Akış Ustası','×5 combo yap.',()=>stats.bestCombo>=5],
-      ['Ekosistem','Lv.7 element üret.',()=>stats.bestLevel>=7],
-      ['Binlik','1000 puana ulaş.',()=>stats.bestScore>=1000],
-      ['Kalıcı Bahçe','10. tura ulaş.',()=>stats.bestRound>=10],
-      ['Sonsuzluk','Lv.10 (Infinity) element üret.',()=>stats.bestLevel>=10],
-      ['Beş Bin','5000 puana ulaş.',()=>stats.bestScore>=5000],
-      ['Güç Ustası','Toplam 20 güç kullan.',()=>stats.powers>=20],
-      ['Maraton','Toplamda 200 ok çıkar.',()=>stats.arrows>=200],
-      ['Merge Makinesi','Toplamda 50 merge yap.',()=>stats.merges>=50]
-    ];
-
-    // ---- Başarım kilidi açılınca bildirim (Sound design / Polish) ----
-    const ACH_SAVE_KEY = 'natureFlow_unlockedAch_v1';
-    let unlockedAchievements = [];
-    function loadAchievementState() {
-      try {
-        const raw = localStorage.getItem(ACH_SAVE_KEY);
-        if (raw) unlockedAchievements = JSON.parse(raw) || [];
-      } catch (e) { unlockedAchievements = []; }
-    }
-    function saveAchievementState() {
-      try { localStorage.setItem(ACH_SAVE_KEY, JSON.stringify(unlockedAchievements)); } catch (e) {}
-    }
-    function checkNewAchievements() {
-      achievementDefs.forEach(([title, , fn], idx) => {
-        if (fn() && !unlockedAchievements.includes(idx)) {
-          unlockedAchievements.push(idx);
-          saveAchievementState();
-          show(`🏅 Başarım: ${title}`);
-          sfx.achievement();
-        }
-      });
-    }
-    function renderStats() {
-      const g=document.getElementById('statsGrid'); if(!g)return;
-      g.innerHTML=[['bestRound','En yüksek tur'],['bestLevel','En yüksek seviye'],['bestScore','En yüksek puan'],['bestCombo','En iyi combo'],['arrows','Çıkan ok'],['merges','Merge'],['powers','Kullanılan güç']].map(([k,l])=>`<div class="stat-box"><div class="n">${stats[k]||0}</div><div class="l">${l}</div></div>`).join('');
-    }
-    function renderAchievements() {
-      const list=document.getElementById('achievementList'); if(!list)return;
-      list.innerHTML=achievementDefs.map(([title,desc,fn])=>{const ok=fn();return `<li class="achievement ${ok?'':'locked'}"><span class="ai">${ok?'✓':'○'}</span><div><div class="at">${title}</div><div class="ad">${desc}</div></div></li>`}).join('');
-    }
-
     function renderCollection() {
       const c = document.getElementById('collection');
       c.innerHTML = '';
@@ -1720,10 +1751,8 @@
           if (isPowerCapable) {
             if (activePower === l) {
               activePower = null;
-              show('Güç iptal edildi');
             } else {
               activePower = l;
-              show('Güç seçildi: Bir engele veya oka tıkla');
               vibrate(10);
             }
             renderCollection();
@@ -1739,7 +1768,6 @@
         c.appendChild(e);
         requestAnimationFrame(() => e.classList.add('merge'));
       });
-      renderDailyChallenge();
     }
 
     // ---- Board modu seçimi ----
@@ -1782,7 +1810,7 @@
       highScore = Math.max(highScore, score);
       document.getElementById('gameOverModal').classList.remove('show');
       document.getElementById('modeModal').classList.remove('show');
-      initBoardData(false, true);
+      initBoardData(false, true, false);
       saveCollection();
       if (!MODES[mode].timeRush) startTimer();
       show(`${MODES[mode].label} moduna geçildi — yeni oyun başladı.`);
@@ -1795,11 +1823,46 @@
       // Rekoru güncelle, koleksiyonu koruyarak oyunu sıfırla
       highScore = Math.max(highScore, score);
       document.getElementById('gameOverModal').classList.remove('show');
-      initBoardData(false, true);
+      initBoardData(false, true, false);
       saveCollection();
       // Zaman Yarışı'nda geri sayım initBoardData içinde zaten başlar; diğer modlarda toplam süreyi sıfırla.
       if (!(MODES[mode] || MODES.classic).timeRush) startTimer();
     };
+
+
+    function resetProgress() {
+      const ok = window.confirm('Tüm koleksiyon, rekor, tur ve istatistikler silinecek. Devam edilsin mi?');
+      if (!ok) return;
+
+      try {
+        localStorage.removeItem(SAVE_KEY);
+        localStorage.removeItem(MODE_SAVE_KEY);
+        localStorage.removeItem('natureFlow_seenHelp');
+      } catch (e) {}
+
+      collection = { 5: 1 };
+      highScore = 0;
+      score = 0;
+      best = 1;
+      round = 1;
+      maxRound = 1;
+      merges = 0;
+      stats.bestCombo = 0;
+      combo = 0;
+      lastActionAt = 0;
+      activePower = null;
+      undoStack = [];
+      document.getElementById('gameOverModal').classList.remove('show');
+      initBoardData(false, false);
+      saveCollection();
+      const cfg = MODES[mode] || MODES.classic;
+      if (cfg.timeRush) startRushTimer();
+      else startTimer();
+      show('İlerleme sıfırlandı.');
+      updateUndoButton();
+    }
+
+    document.getElementById('undoBtn').onclick = undoLastMove;
 
     document.getElementById('restartBtn').onclick = () => {
       document.getElementById('reset').click();
@@ -1810,6 +1873,8 @@
     document.getElementById('helpBtn').onclick = () => {
       document.getElementById('helpModal').classList.add('show');
     };
+
+    document.getElementById('clearDataBtn').onclick = resetProgress;
 
     document.getElementById('closeHelpBtn').onclick = () => {
       document.getElementById('helpModal').classList.remove('show');
@@ -1822,25 +1887,16 @@
 
     document.getElementById('cancelPowerBtn').onclick = () => {
       activePower = null;
-      show('Güç iptal edildi');
       renderCollection();
       updateHud();
     };
-
-    document.getElementById('statsBtn').onclick = () => { renderStats(); document.getElementById('statsModal').classList.add('show'); };
-    document.getElementById('closeStatsBtn').onclick = () => document.getElementById('statsModal').classList.remove('show');
-    document.getElementById('closeStatsBtn2').onclick = () => document.getElementById('statsModal').classList.remove('show');
-    document.getElementById('achievementsBtn').onclick = () => { renderAchievements(); document.getElementById('achievementsModal').classList.add('show'); };
-    document.getElementById('closeAchievementsBtn').onclick = () => document.getElementById('achievementsModal').classList.remove('show');
-    document.getElementById('closeAchievementsBtn2').onclick = () => document.getElementById('achievementsModal').classList.remove('show');
 
     // Ambiyans parçacıkları
     spawnFireflies();
     applyStaticIcons();
 
-    // Başlangıçta mod tercihini, koleksiyonu ve başarım durumunu yükle (yoksa Lv.5 hediye et)
+    // Başlangıç verilerini yükle
     loadMode();
-    loadAchievementState();
     loadCollection();
     initBoardData(false, false);
     if (!(MODES[mode] || MODES.classic).timeRush) startTimer();
@@ -1858,6 +1914,13 @@
         }
       }, 420);
     });
+
+    // PWA / çevrimdışı önbellek
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
 
     // İlk kez oynayan kullanıcıya "nasıl oynanır" göster
     try {
